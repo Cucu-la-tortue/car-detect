@@ -315,7 +315,7 @@ def show_error_about_min_car():
     messagebox.showerror("Erreur", 
                         "Veuillez sélectionner une taille minimale de voiture.")
 
-def detect_and_save_frames(video_path, start_datetime, display_video, output_folder="Cars", progress_bar=None, root=None):
+def detect_and_save_frames(video_path, start_datetime, display_video, progress_bar, percentage_label, output_folder="Cars"):
     """Fonction pour détecter et sauvegarder les images"""
 
     try:
@@ -361,9 +361,8 @@ def detect_and_save_frames(video_path, start_datetime, display_video, output_fol
     frame_height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
     min_car_area = min_car_w * min_car_h
 
-    # Initialiser la barre de progression si elle est fournie
-    if progress_bar:
-        progress_bar["maximum"] = total_frames  # Définir le maximum de la barre de progression
+    # Initialiser la barre de progression
+    progress_bar["maximum"] = total_frames  # Définir le maximum de la barre de progression
     
     with tqdm(total=total_frames // frame_interval, desc="Processing Video", unit="frame") as pbar:
         while True:
@@ -467,9 +466,10 @@ def detect_and_save_frames(video_path, start_datetime, display_video, output_fol
             if cv2.waitKey(1) & 0xFF == ord('q'):
                 break
 
-            # Mettre à jour la barre de progression
-            if progress_bar:
-                progress_bar["value"] = frame_count  # Met à jour la valeur actuelle
+            # Mettre à jour la barre de progression et le pourcentage
+            progress_bar["value"] = frame_count
+            percentage_label.config(text=f"{round(frame_count * 100 / total_frames)} %")
+            root.update_idletasks()
 
             
             frame_count += 1
@@ -492,7 +492,7 @@ def detect_and_save_frames(video_path, start_datetime, display_video, output_fol
 
 # Initialisation de l'interface
 def main():
-    global video_path
+    global video_path, root
 
     # Créer la fenêtre principale
     root = tk.Tk()
@@ -554,14 +554,17 @@ def main():
                                   variable=display_video)
     display_checkbox.pack(pady=10)
 
+    # Créer une barre de progression et un pourcentage
+    progress_bar = ttk.Progressbar(root, orient="horizontal", length=400, mode="determinate")
+    percentage_label = tk.Label(root, text="0%", font=('Helvetica', 12))
+    
     # Bouton pour lancer le traitement
     process_button = tk.Button(root, text="Lancer le traitement", 
-                                command=lambda: detect_and_save_frames(video_path, start_time_entry.get(), display_video.get(), progress_bar, root))
-    process_button.pack(pady=10)
+                                command=lambda: detect_and_save_frames(video_path, start_time_entry.get(), display_video.get(), progress_bar, percentage_label))
+    process_button.pack(pady=20)
 
-    # Ajouter une barre de progression
-    progress_bar = ttk.Progressbar(root, orient="horizontal", length=400, mode="determinate")
-    progress_bar.pack(pady=20)
+    progress_bar.pack()
+    percentage_label.pack(pady=10)
 
     # Lancer l'interface
     root.mainloop()

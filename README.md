@@ -63,7 +63,7 @@ pip install opencv-python pillow tqdm numpy
 ├── detection_utils.py       # Fonctions utilitaires pour la détection
 ├── config.py                # Paramètres globaux
 ├── votre_script.py          # Script principal avec interface Tkinter
-├── Cars/                  # Répertoire pour les résultats
+├── Cars/                    # Répertoire pour les résultats
 └── README.md                # Documentation
 ```
 
