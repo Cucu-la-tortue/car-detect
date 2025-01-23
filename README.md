@@ -25,7 +25,7 @@ Assurez-vous d'avoir installé les bibliothèques suivantes :
 Vous pouvez installer les dépendances avec :
 
 ```bash
-pip install opencv-python-headless pillow tqdm numpy
+pip install opencv-python pillow tqdm numpy
 ```
 
 ## Installation
