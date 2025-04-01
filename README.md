@@ -13,10 +13,17 @@ Ce projet utilise OpenCV et Tkinter pour développer une application graphique p
 
 ## Prérequis
 
+### Ouvrir un terminal
+
+- **Sur Linux** :  
+  Ouvrez un terminal en appuyant sur `Ctrl + Alt + T` ou en recherchant "Terminal" dans vos applications.
+
+- **Sur Windows** :  
+  Ouvrez l'invite de commandes (CMD) ou PowerShell en appuyant sur `Win + R`, puis tapez `cmd` ou `powershell` et appuyez sur `Entrée`.
+
 Assurez-vous d'avoir installé les éléments suivants :
 
 ### Python 3.7 ou plus
-- Si Python n'est pas installé, téléchargez-le depuis [python.org](https://www.python.org/downloads/) et suivez les instructions d'installation.
 - Pour vérifier si Python est installé, exécutez l'une des commandes suivantes dans un terminal :
 
   ```bash
@@ -27,10 +34,11 @@ Assurez-vous d'avoir installé les éléments suivants :
   python3 --version
   ```
   
-  Si une version est affichée, Python est correctement installé.
+  Si une version >= 3.7 est affichée, Python est correctement installé.
+
+- Si Python n'est pas installé, téléchargez-le depuis [python.org](https://www.python.org/downloads/) et suivez les instructions d'installation. Vous pouvez ensuite vérifier qu'il est bien installé en tapant la commande ci-dessus.
 
 ### Git
-- Si Git n'est pas installé, téléchargez-le depuis [git-scm.com](https://git-scm.com/) et suivez les instructions d'installation.
 - Pour vérifier si Git est installé, exécutez la commande suivante dans un terminal :
 
   ```bash
@@ -38,6 +46,7 @@ Assurez-vous d'avoir installé les éléments suivants :
   ```
   
   Si une version est affichée, Git est correctement installé.
+- Si Git n'est pas installé, téléchargez-le depuis [git-scm.com](https://git-scm.com/) et suivez les instructions d'installation. Vous pouvez ensuite vérifier qu'il est bien installé en tapant la commande ci-dessus.
 
 ### Bibliothèques Python
 - OpenCV (`cv2`)
@@ -46,7 +55,7 @@ Assurez-vous d'avoir installé les éléments suivants :
 - tqdm
 - numpy
 
-Vous pouvez installer les dépendances avec :
+Vous pouvez installer les dépendances en tapant :
 
 ```bash
 pip install opencv-python pillow tqdm numpy
@@ -60,36 +69,55 @@ pip3 install opencv-python pillow tqdm numpy
 
 ## Installation
 
-1. Clonez ce dépôt sur votre machine locale :
+### Étape 1 : Ouvrir un terminal
 
-   ```bash
-   git clone https://github.com/cucu-la-tortue/car-detect.git
-   cd car-detect
-   ```
+- **Sur Linux** :  
+  Ouvrez un terminal en appuyant sur `Ctrl + Alt + T` ou en recherchant "Terminal" dans vos applications.
 
-2. Placez vos vidéos dans le répertoire de travail, ou préparez un chemin d'accès valide.
+- **Sur Windows** :  
+  Ouvrez l'invite de commandes (CMD) ou PowerShell en appuyant sur `Win + R`, puis tapez `cmd` ou `powershell` et appuyez sur `Entrée`.
 
-3. Lancez le script principal :
+### Étape 2 : Se déplacer dans le répertoire Bureau
 
-   ```bash
-   python main.py
-   ```
-   ou
-   ```bash
-   python3 main.py
-   ```
+- **Sur Linux** :  
+  Une fois le terminal ouvert, tapez la commande suivante pour vous déplacer sur votre bureau :
+  ```bash
+  cd Bureau
+  ```
+
+- **Sur Windows** :  
+  Dans l'invite de commandes ou PowerShell, tapez la commande suivante pour vous déplacer dans le répertoire Bureau :
+  ```bash
+  cd Desktop
+  ```
+
+### Étape 3 : Cloner le projet
+
+Une fois sur le Bureau, clonez le dépôt du projet en tapant :
+
+```bash
+git clone https://github.com/cucu-la-tortue/car-detect.git
+```
+
+### Étape 4 : Fermer le terminal
+
+Vous pouvez maintenant fermer le terminal en tapant la commande suivante ou en fermant simplement la fenêtre du terminal :
+
+  ```bash
+  exit
+  ```
 
 ## Instructions d'utilisation
 
-1. **Lancer l'application** : Démarrez l'application en exécutant le script.
-2. **Charger une vidéo** : Cliquez sur le bouton **"Charger Vidéo"** pour sélectionner une vidéo au format `.mp4`.
+1. **Lancer l'application** : Allez sur votre Bureau, double-cliquez sur le dossier `car-detect`, et double-cliquez sur le script `main.py`.
+2. **Charger une vidéo** : Cliquez sur le bouton **"Charger Vidéo"** pour sélectionner une vidéo.
 3. **Visualiser la première frame** : Cliquez sur **"Visualiser l'horodatage initial"** pour afficher la première image et sélectionner le moment de départ.
-4. **Sélectionner la ROI** :
+4. **Sélectionner la zone d'intérêt** :
     - Appuyez sur le bouton correspondant.
-    - Déplacez-vous dans les frames avec les touches `q/d` ou les flèches.
-    - Dessinez une zone avec la souris et validez avec `v`.
+    - Déplacez-vous (si vous le souhaitez) dans la vidéo avec les touches `Q/D` ou les flèches.
+    - Dessinez une zone avec la souris et validez avec `V`.
 5. **Définir la taille minimale de véhicule** : Suivez la même procédure pour définir la taille des véhicules à détecter.
-6. **Lancer la détection** : Cliquez sur le bouton pour détecter et sauvegarder les images des véhicules détectés dans le répertoire `Cars`.
+6. **Lancer la détection** : Cliquez sur le bouton pour détecter et sauvegarder les images des véhicules détectés dans le répertoire `Voitures`.
 
 ## Structure du projet
 
@@ -97,7 +125,7 @@ pip3 install opencv-python pillow tqdm numpy
 ├── detection_utils.py       # Fonctions utilitaires pour la détection
 ├── config.py                # Paramètres globaux
 ├── main.py                  # Script principal avec interface Tkinter
-├── Cars/                    # Répertoire pour les résultats
+├── Voitures/                    # Répertoire pour les résultats
 └── README.md                # Documentation
 ```
 
