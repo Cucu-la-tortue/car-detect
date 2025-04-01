@@ -109,6 +109,7 @@ Vous pouvez maintenant fermer le terminal en tapant la commande suivante ou en f
 
 ## Instructions d'utilisation
 
+1. **Chargement des vidéos** : Copiez-collez la ou les vidéo(s) à traiter dans le dossier `Videos`. Ce dossier se situe dans le dossier `car-detect`, sur votre Bureau.
 1. **Lancer l'application** : Allez sur votre Bureau, double-cliquez sur le dossier `car-detect`, et double-cliquez sur le script `main.py`.
 2. **Charger une vidéo** : Cliquez sur le bouton **"Charger Vidéo"** pour sélectionner une vidéo.
 3. **Visualiser la première frame** : Cliquez sur **"Visualiser l'horodatage initial"** pour afficher la première image et sélectionner le moment de départ.
@@ -117,7 +118,7 @@ Vous pouvez maintenant fermer le terminal en tapant la commande suivante ou en f
     - Déplacez-vous (si vous le souhaitez) dans la vidéo avec les touches `Q/D` ou les flèches.
     - Dessinez une zone avec la souris et validez avec `V`.
 5. **Définir la taille minimale de véhicule** : Suivez la même procédure pour définir la taille des véhicules à détecter.
-6. **Lancer la détection** : Cliquez sur le bouton pour détecter et sauvegarder les images des véhicules détectés dans le répertoire `Voitures`.
+6. **Lancer la détection** : Cliquez sur le bouton pour détecter et sauvegarder les images des véhicules détectés. Ces images seront sauvegardés dans un répertoire du même nom que la vidéo.
 
 ## Structure du projet
 
@@ -125,7 +126,6 @@ Vous pouvez maintenant fermer le terminal en tapant la commande suivante ou en f
 ├── detection_utils.py       # Fonctions utilitaires pour la détection
 ├── config.py                # Paramètres globaux
 ├── main.py                  # Script principal avec interface Tkinter
-├── Voitures/                    # Répertoire pour les résultats
 └── README.md                # Documentation
 ```
 
