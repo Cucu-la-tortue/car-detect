@@ -109,16 +109,17 @@ Vous pouvez maintenant fermer le terminal en tapant la commande suivante ou en f
 
 ## Instructions d'utilisation
 
-1. **Chargement des vidéos** : Copiez-collez la ou les vidéo(s) à traiter dans le dossier `Videos`. Ce dossier se situe dans le dossier `car-detect`, sur votre Bureau.
-1. **Lancer l'application** : Allez sur votre Bureau, double-cliquez sur le dossier `car-detect`, et double-cliquez sur le script `main.py`.
-2. **Charger une vidéo** : Cliquez sur le bouton **"Charger Vidéo"** pour sélectionner une vidéo.
-3. **Visualiser la première frame** : Cliquez sur **"Visualiser l'horodatage initial"** pour afficher la première image et sélectionner le moment de départ.
-4. **Sélectionner la zone d'intérêt** :
+1. **Chargement des vidéos** : Allez sur votre Bureau, puis dans le répertoire `car-detect`. Créez dans ce répertoire un dossier `Videos`. Dans ce dossier, copiez-collez la ou les vidéo(s) à traiter.
+2. **Lancer l'application** : Allez sur votre Bureau, double-cliquez sur le dossier `car-detect`, et double-cliquez sur le script `main.py`.
+3. **Charger une vidéo** : Cliquez sur le bouton **"Charger Vidéo"** pour sélectionner une vidéo.
+4. **Visualiser la première frame** : Cliquez sur **"Visualiser l'horodatage initial"** pour afficher la première image et sélectionner le moment de départ.
+5. **Sélectionner la zone d'intérêt** :
     - Appuyez sur le bouton correspondant.
     - Déplacez-vous (si vous le souhaitez) dans la vidéo avec les touches `Q/D` ou les flèches.
     - Dessinez une zone avec la souris et validez avec `V`.
-5. **Définir la taille minimale de véhicule** : Suivez la même procédure pour définir la taille des véhicules à détecter.
-6. **Lancer la détection** : Cliquez sur le bouton pour détecter et sauvegarder les images des véhicules détectés. Ces images seront sauvegardés dans un répertoire du même nom que la vidéo.
+6. **Définir la taille minimale de véhicule** : Suivez la même procédure pour définir la taille des véhicules à détecter.
+7. **Lancer la détection** : Cliquez sur le bouton pour détecter et sauvegarder les images des véhicules détectés.
+8. **Consulter les images** : Une fois la vidéo entièrement traitée (voir la barre de progression), vous pouvez fermer la fenêtre et aller consulter les résultats. Les images sont sauvegardés dans un répertoire du même nom que la vidéo.
 
 ## Structure du projet
 
