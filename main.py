@@ -21,7 +21,7 @@ def load_video(path_label):
     current_directory = os.getcwd()
     video_path = filedialog.askopenfilename(
         initialdir=current_directory,
-        filetypes=[("Fichiers Vidéo", "*.mp4")]
+        filetypes=[("Fichiers Vidéo", "*.mp4 *.avi *.mov *.mkv")]
     )
     if video_path:
         # Obtenir le chemin relatif par rapport au répertoire courant
