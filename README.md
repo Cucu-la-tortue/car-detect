@@ -13,9 +13,33 @@ Ce projet utilise OpenCV et Tkinter pour développer une application graphique p
 
 ## Prérequis
 
-Assurez-vous d'avoir installé les bibliothèques suivantes :
+Assurez-vous d'avoir installé les éléments suivants :
 
-- Python >= 3.7
+### Python 3.7 ou plus
+- Si Python n'est pas installé, téléchargez-le depuis [python.org](https://www.python.org/downloads/) et suivez les instructions d'installation.
+- Pour vérifier si Python est installé, exécutez l'une des commandes suivantes dans un terminal :
+
+  ```bash
+  python --version
+  ```
+  ou
+  ```bash
+  python3 --version
+  ```
+  
+  Si une version est affichée, Python est correctement installé.
+
+### Git
+- Si Git n'est pas installé, téléchargez-le depuis [git-scm.com](https://git-scm.com/) et suivez les instructions d'installation.
+- Pour vérifier si Git est installé, exécutez la commande suivante dans un terminal :
+
+  ```bash
+  git --version
+  ```
+  
+  Si une version est affichée, Git est correctement installé.
+
+### Bibliothèques Python
 - OpenCV (`cv2`)
 - Tkinter (inclus dans Python pour Windows/Mac)
 - PIL (via `Pillow`)
@@ -26,6 +50,12 @@ Vous pouvez installer les dépendances avec :
 
 ```bash
 pip install opencv-python pillow tqdm numpy
+```
+
+ou
+
+```bash
+pip3 install opencv-python pillow tqdm numpy
 ```
 
 ## Installation
@@ -41,6 +71,10 @@ pip install opencv-python pillow tqdm numpy
 
 3. Lancez le script principal :
 
+   ```bash
+   python main.py
+   ```
+   ou
    ```bash
    python3 main.py
    ```
@@ -62,7 +96,7 @@ pip install opencv-python pillow tqdm numpy
 ```
 ├── detection_utils.py       # Fonctions utilitaires pour la détection
 ├── config.py                # Paramètres globaux
-├── votre_script.py          # Script principal avec interface Tkinter
+├── main.py                  # Script principal avec interface Tkinter
 ├── Cars/                    # Répertoire pour les résultats
 └── README.md                # Documentation
 ```
@@ -79,8 +113,9 @@ Certains paramètres peuvent être ajustés dans le fichier `config.py` :
 
 - La détection repose sur le soustracteur de fond et peut être affectée par des changements soudains dans l'éclairage.
 - Lorsque la couleur de la voiture est trop proche de la couleur du fond (par exemple de la route), elle peut ne pas être détectée.
-- La taille minimale de véhicule doit être soigneusement définie pour éviter les faux positifs. Attention: de nuit, veillez à sélectionner une taille de voiture plus petite (car le programme aura du mal à détecter la voiture en entier).
+- La taille minimale de véhicule doit être soigneusement définie pour éviter les faux positifs. **Attention** : de nuit, veillez à sélectionner une taille de voiture plus petite (car le programme aura du mal à détecter la voiture en entier).
 
 ## Licence
 
 Ce projet est sous licence [MIT](LICENSE).
+
