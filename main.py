@@ -335,7 +335,7 @@ def toggle_warning():
     else:
         warning_label.pack_forget()
 
-def detect_and_save_frames(video_path, start_datetime, display_video, progress_bar, percentage_label, output_folder="Cars"):
+def detect_and_save_frames(video_path, start_datetime, display_video, progress_bar, percentage_label):
     """Fonction pour détecter et sauvegarder les images"""
 
     try:
@@ -361,6 +361,8 @@ def detect_and_save_frames(video_path, start_datetime, display_video, progress_b
     cap = cv2.VideoCapture(video_path)
     total_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))  # Nombre total de frames
     
+    video_name = os.path.basename(video_path)      # On enlève tout le chemin avant
+    video_name = os.path.splitext(video_name)[0]   # On enlève l'extension
 
     if frame_window:
             frame_window.destroy()
@@ -477,12 +479,11 @@ def detect_and_save_frames(video_path, start_datetime, display_video, progress_b
 
             # Dessiner la zone d'intérêt (ROI)
             cv2.rectangle(frame, (roi_x, roi_y), (roi_x + roi_w, roi_y + roi_h), (255, 0, 0), 2)
-
-            # Crée une fenêtre redimensionnable
-            cv2.namedWindow("Frame", cv2.WINDOW_NORMAL)
             
             # Afficher la vidéo avec les objets détectés et la zone d'intérêt (ROI) si c'est demandé
             if display_video:
+                # Crée une fenêtre redimensionnable
+                cv2.namedWindow("Frame", cv2.WINDOW_NORMAL)
                 cv2.imshow("Frame", frame)
 
             # Quitter si l'utilisateur appuie sur "q"
@@ -499,12 +500,16 @@ def detect_and_save_frames(video_path, start_datetime, display_video, progress_b
 
             # Mettre à jour la barre de progression
             pbar.set_postfix(cars_detected=len(detected_cars))
-            pbar.update(1)
+            pbar.update(1)    
 
     # Sauvegarder les images des target
+    print(video_name)
+    if not os.path.exists(video_name):
+        os.makedirs(video_name)
+        print("ok")
     for i, car in enumerate(detected_cars):
         file_timestamp = car["time"].strftime("%Y%m%d_%H%M%S")   # Timestamp formaté pour le nom du fichier
-        file_name = f"{output_folder}/car_{i}.jpg"
+        file_name = f"{video_name}/car_{i}.jpg"
         cv2.imwrite(file_name, car["image"])
 
     # Libérer la vidéo et fermer les fenêtres
