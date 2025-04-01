@@ -7,7 +7,7 @@ roi_x, roi_y, roi_w, roi_h = -1, -1, 0, 0  # Coordonnées du ROI
 
 
 iou_threshold = 0.4
-frame_interval = 3
+frame_interval = 5
 max_inactive_frames = 3  # Nombre maximal de frames où une voiture peut rester inactive
 
 

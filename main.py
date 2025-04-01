@@ -74,6 +74,7 @@ def display_first_frame(video_path):
         img_label.image = img
     
     cap.release()
+    
 
 
 
@@ -157,6 +158,10 @@ def select_roi_from_video(video_path):
 
     current_frame_index = 0
     original_frame = frame.copy()
+
+    # Crée une fenêtre redimensionnable
+    cv2.namedWindow("Frame", cv2.WINDOW_NORMAL)
+
     cv2.imshow("Frame", frame)
 
     # Assigner le callback pour la souris
@@ -165,13 +170,15 @@ def select_roi_from_video(video_path):
     while True:
         key = cv2.waitKey(1) & 0xFF
 
-        if key == 27:  # Quitter (avec la touche esc)
+        if key == 27 or cv2.getWindowProperty("Frame", cv2.WND_PROP_VISIBLE) < 1:  # Quitter (avec la touche esc ou en fermant manuellement la fenêtre)
             print("Sélection annulée.")
             break
 
         elif key == ord('v'):  # Valider
             if roi_w > 0 and roi_h > 0:  # Vérifier que la ROI est valide
                 print(f"Zone d'intérêt validée : ({roi_x}, {roi_y}), largeur={roi_w}, hauteur={roi_h}")
+                # Afficher le tic vert à côté du bouton
+                roi_selected_label.config(text="OK", fg="green")
                 break
             else:
                 print("La sélection est invalide. Veuillez dessiner une ROI correcte.")
@@ -228,6 +235,10 @@ def select_min_car_from_video(video_path):
 
     current_frame_index = 0
     original_frame = frame.copy()
+
+    # Crée une fenêtre redimensionnable
+    cv2.namedWindow("Frame", cv2.WINDOW_NORMAL)
+
     cv2.imshow("Frame", frame)
 
     # Assigner le callback pour la souris
@@ -236,13 +247,15 @@ def select_min_car_from_video(video_path):
     while True:
         key = cv2.waitKey(1) & 0xFF
 
-        if key == 27:  # Quitter (avec la touche esc)
+        if key == 27 or cv2.getWindowProperty("Frame", cv2.WND_PROP_VISIBLE) < 1:  # Quitter (avec la touche esc ou en fermant manuellement la fenêtre)
             print("Sélection annulée.")
             break
 
         elif key == ord('v'):  # Valider
             if min_car_w > 0 and min_car_h > 0:  # Vérifier que la ROI est valide
                 print(f"Zone d'intérêt validée : ({min_car_x}, {min_car_y}), largeur={min_car_w}, hauteur={min_car_h}")
+                # Afficher le tic vert à côté du bouton
+                min_car_selected_label.config(text="OK", fg="green")
                 break
             else:
                 print("La sélection est invalide. Veuillez dessiner une ROI correcte.")
@@ -314,6 +327,13 @@ def show_error_about_roi():
 def show_error_about_min_car():
     messagebox.showerror("Erreur", 
                         "Veuillez sélectionner une taille minimale de voiture.")
+
+def toggle_warning():
+    """Affiche ou masque le message d'avertissement selon l'état de la checkbox"""
+    if display_video.get():
+        warning_label.pack(pady=5)
+    else:
+        warning_label.pack_forget()
 
 def detect_and_save_frames(video_path, start_datetime, display_video, progress_bar, percentage_label, output_folder="Cars"):
     """Fonction pour détecter et sauvegarder les images"""
@@ -458,6 +478,9 @@ def detect_and_save_frames(video_path, start_datetime, display_video, progress_b
             # Dessiner la zone d'intérêt (ROI)
             cv2.rectangle(frame, (roi_x, roi_y), (roi_x + roi_w, roi_y + roi_h), (255, 0, 0), 2)
 
+            # Crée une fenêtre redimensionnable
+            cv2.namedWindow("Frame", cv2.WINDOW_NORMAL)
+            
             # Afficher la vidéo avec les objets détectés et la zone d'intérêt (ROI) si c'est demandé
             if display_video:
                 cv2.imshow("Frame", frame)
@@ -492,7 +515,7 @@ def detect_and_save_frames(video_path, start_datetime, display_video, progress_b
 
 # Initialisation de l'interface
 def main():
-    global video_path, root
+    global video_path, root, display_video, warning_label, roi_selected_label, min_car_selected_label
 
     # Créer la fenêtre principale
     root = tk.Tk()
@@ -526,33 +549,53 @@ def main():
                                   text="Instructions pour la sélection :\n"
                                   "- Utilisez les flèches gauche/droite ou les touches q/d pour parcourir la vidéo.\n"
                                   "- Cliquez et faites glisser pour sélectionner une zone d'intérêt.\n"
-                                  "- Appuyez sur 'v' pour valider la sélection.\n"
-                                  "- Appuyez sur 'r' pour réinitialiser la sélection.\n"
-                                  "- Appuyez sur 'echap' pour quitter sans valider."
+                                  "- Appuyez sur 'V' pour valider la sélection.\n"
+                                  "- Appuyez sur 'R' pour réinitialiser la sélection.\n"
+                                  "- Appuyez sur 'ECHAP' pour quitter sans valider.",
+                                  font=("Helvetica", 11, "bold")
                                   )
     instructions_label.pack(pady=10)
+    
+    # Création d'une frame pour regrouper le bouton et le label
+    roi_frame = tk.Frame(root)
+    roi_frame.pack(pady=5)
 
     # Bouton pour sélectionner la ROI
-    select_roi_button = tk.Button(root, text="Sélectionner la zone de traitement", 
+    select_roi_button = tk.Button(roi_frame, text="Sélectionner la zone de traitement", 
                                   command=lambda: select_roi_from_video(video_path))
-    select_roi_button.pack(pady=10)
+    select_roi_button.pack(side=tk.RIGHT, padx=5)
 
-    # Création d'une frame pour regrouper les deux prochains boutons
-    select_min_car_frame = tk.Frame(root)
-    select_min_car_frame.pack(pady=10)
+    # Label de confirmation de sélection de la roi
+    roi_selected_label = tk.Label(roi_frame, text="", font=("Arial", 12, "bold"))  # Label vide au départ
+    roi_selected_label.pack(side=tk.LEFT)
+
+    # Création d'une frame pour regrouper les deux prochains boutons et le label
+    min_car_frame = tk.Frame(root)
+    min_car_frame.pack(pady=5)
+
+    info_button = tk.Button(min_car_frame, text="Pourquoi ?", command=show_info_about_min_car_button)
+    info_button.pack(side=tk.RIGHT)
 
     # Bouton pour sélectionner la taille de voiture minimale (+ bouton d'information)
-    select_min_car_button = tk.Button(select_min_car_frame, text="Sélectionner la taille minimale des voitures à détecter", 
+    select_min_car_button = tk.Button(min_car_frame, text="Sélectionner la taille minimale des voitures à détecter", 
                                   command=lambda: select_min_car_from_video(video_path))
-    select_min_car_button.pack(side=tk.LEFT, padx=5)
+    select_min_car_button.pack(side=tk.RIGHT, padx=5)
     
-    info_button = tk.Button(select_min_car_frame, text="Pourquoi ?", command=show_info_about_min_car_button)
-    info_button.pack(side=tk.LEFT)
+    # Label de confirmation de sélection de la min car
+    min_car_selected_label = tk.Label(min_car_frame, text="", font=("Arial", 12, "bold"))  # Label vide au départ
+    min_car_selected_label.pack(side=tk.LEFT)
+
 
     # Bouton pour afficher ou non la vidéo
     display_checkbox = tk.Checkbutton(root, text="Afficher la vidéo pendant le traitement", 
-                                  variable=display_video)
+                                  variable=display_video, command=toggle_warning)
     display_checkbox.pack(pady=10)
+
+    # Label d'avertissement (caché au départ)
+    warning_label = tk.Label(root, text="⚠ Avertissement : afficher la vidéo pendant le traitement\n"
+                                        "peut rallonger la durée du traitement.",
+                            fg="red", font=("Arial", 10, "italic"))
+    
 
     # Créer une barre de progression et un pourcentage
     progress_bar = ttk.Progressbar(root, orient="horizontal", length=400, mode="determinate")
@@ -566,6 +609,8 @@ def main():
     progress_bar.pack()
     percentage_label.pack(pady=10)
 
+    # On place la fenêtre sur le coin en haut à gauche
+    root.geometry(f"+{0}+{0}")
     # Lancer l'interface
     root.mainloop()
 
