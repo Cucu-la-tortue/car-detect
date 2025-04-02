@@ -112,7 +112,7 @@ Vous pouvez maintenant fermer le terminal en tapant la commande suivante ou en f
 ## Instructions d'utilisation
 
 1. **Chargement des vidéos** : Allez sur votre Bureau, puis dans le répertoire `car-detect`. Créez dans ce répertoire un dossier `Videos`. Dans ce dossier, copiez-collez la ou les vidéo(s) à traiter.
-2. **Lancer l'application** : Allez sur votre Bureau, double-cliquez sur le dossier `car-detect`, et double-cliquez sur le script `main.py`.
+2. **Lancer l'application** : Allez sur votre Bureau, double-cliquez sur le dossier `car-detect`, et double-cliquez sur le script `main.py` (ou en l'ouvrant avec **"Python"**).
 3. **Charger une ou des vidéo(s)** : Cliquez sur le bouton **"Charger Vidéos"** pour sélectionner une ou plusieurs vidéos.  
 ⚠ **Important :** Si vous sélectionnez plusieurs vidéos, **assurez-vous de les choisir dans le bon ordre**, car elles seront traitées successivement comme une seule séquence. **La même zone de traitement sera appliquée à toutes les vidéos sélectionnées.**
 4. **Visualiser la première frame** : Cliquez sur **"Visualiser l'horodatage initial"** pour afficher la première image et sélectionner le moment de départ.

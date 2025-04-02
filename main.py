@@ -1,6 +1,8 @@
 import time
+import threading
 import cv2
 import os
+import sys
 import numpy as np
 import tkinter as tk
 
@@ -338,6 +340,8 @@ def toggle_warning():
 
 def detect_and_save_frames(video_path, start_datetime, display_video, progress_bar, percentage_label, time_remaining_label):
     """Fonction pour détecter et sauvegarder les images"""
+    global stop_processing
+    stop_processing = False  # Réinitialiser le flag au démarrage
 
     try:
         assert video_path is not None, "Aucune vidéo chargée"
@@ -358,8 +362,6 @@ def detect_and_save_frames(video_path, start_datetime, display_video, progress_b
         assert min_car_w > 0 and min_car_h > 0, "Aucune ROI sélectionnée"
     except AssertionError:
         show_error_about_min_car()
-    
-    start_time = time.time()  # Temps de début du traitement
 
     cap = cv2.VideoCapture(video_path)
     total_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))  # Nombre total de frames
@@ -367,6 +369,7 @@ def detect_and_save_frames(video_path, start_datetime, display_video, progress_b
     video_name = os.path.basename(video_path)      # On enlève tout le chemin avant
     video_name = os.path.splitext(video_name)[0]   # On enlève l'extension
 
+    # Supprime la fenêtre de la première frame affichée pour l'horodatage
     if frame_window:
             frame_window.destroy()
 
@@ -390,9 +393,15 @@ def detect_and_save_frames(video_path, start_datetime, display_video, progress_b
     progress_bar["maximum"] = total_frames  # Définir le maximum de la barre de progression
     
     with tqdm(total=total_frames // frame_interval, desc="Processing Video", unit="frame") as pbar:
+        start_time = time.time()  # Temps de début du traitement
+        
         while True:
-            ret, frame = cap.read()
 
+            if stop_processing:  # Vérifier si l'utilisateur a demandé l'arrêt
+                print("Traitement interrompu par l'utilisateur.")
+                break  # Sortir proprement de la boucle
+
+            ret, frame = cap.read()
             if not ret:
                 break  # Fin de la vidéo ou erreur de lecture de frame
             
@@ -534,6 +543,23 @@ def detect_and_save_frames(video_path, start_datetime, display_video, progress_b
     cv2.destroyAllWindows()
 
 
+def start_processing(video_path, start_datetime, display_video, progress_bar, percentage_label, time_remaining_label):
+    """Démarrer le traitement dans un thread séparé"""
+    global processing_thread
+    processing_thread = threading.Thread(target=process_video_queue, 
+                                         args=(video_path, start_datetime, display_video, progress_bar, percentage_label, time_remaining_label))
+    processing_thread.start()
+
+def on_closing():
+    """Gérer la fermeture de la fenêtre et arrêter proprement le traitement"""
+    global stop_processing
+    if messagebox.askokcancel("Quitter", "Voulez-vous vraiment arrêter le traitement et quitter ?"):
+        stop_processing = True  # Définir le flag d'arrêt
+        root.destroy()  # Fermer la fenêtre principale
+
+
+
+
 def get_video_duration(video_path):
     """Retourne la durée d'une vidéo en secondes"""
     try:
@@ -668,7 +694,7 @@ def main():
     
     # Bouton pour lancer le traitement
     process_button = tk.Button(root, text="Lancer le traitement", 
-                                command=lambda: process_video_queue(start_time_entry, display_video.get(), progress_bar, percentage_label, video_progress_label, time_remaining_label))
+                                command=lambda: start_processing(start_time_entry, display_video.get(), progress_bar, percentage_label, video_progress_label, time_remaining_label))
     process_button.pack(pady=20)
 
     progress_bar.pack()
@@ -680,9 +706,12 @@ def main():
     video_progress_label = tk.Label(root, text="0/0 vidéos", font=('Helvetica', 12))
     video_progress_label.pack(pady=5)
 
+    # Associer la gestion de la fermeture de la fenêtre
+    root.protocol("WM_DELETE_WINDOW", on_closing)
 
     # On place la fenêtre sur le coin en haut à gauche
     root.geometry(f"+{0}+{0}")
+
     # Lancer l'interface
     root.mainloop()
 

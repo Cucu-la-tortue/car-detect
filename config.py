@@ -17,3 +17,6 @@ frame = None  # Frame actuelle
 start_point = (-1, -1)  # Point de départ du rectangle
 original_frame = None  # Copie de la frame originale
 current_frame_index = 0  # Index de la frame actuelle
+
+# Flag pour indiquer si l'utilisateur souhaite arrêter le traitement
+stop_processing = False
