@@ -1,3 +1,4 @@
+import time
 import cv2
 import os
 import numpy as np
@@ -15,20 +16,20 @@ from config import *
 ##### VIDEO UTILS =======================================================================================================================
 def load_video(path_label):
     """Fonction pour ouvrir la boîte de dialogue et récupérer le chemin du fichier vidéo"""
-    global video_path
+    global video_queue
 
     # Ouvrir une boîte de dialogue pour sélectionner un fichier vidéo à partir du dossier courant
     current_directory = os.getcwd()
-    video_path = filedialog.askopenfilename(
+    video_paths = filedialog.askopenfilenames(
         initialdir=current_directory,
-        filetypes=[("Fichiers Vidéo", "*.mp4 *.avi *.mov *.mkv")]
+        filetypes=[("Fichiers Vidéo", "*.mp4 *.avi *.mov *.mkv")],
+        title="Sélectionnez des vidéos"
     )
-    if video_path:
-        # Obtenir le chemin relatif par rapport au répertoire courant
-        relative_path = os.path.relpath(video_path, current_directory)
+    if video_paths:
+        video_queue = list(video_paths)   # Stocker les vidéos dans une liste
         
-        # Afficher le chemin relatif dans le label
-        path_label.config(text=f"Chemin relatif de la vidéo : {relative_path}")
+        # Afficher le nombre de vidéos sélectionnées
+        path_label.config(text=f"{len(video_queue)} vidéo(s) sélectionnée(s)")
 
 
 
@@ -335,7 +336,7 @@ def toggle_warning():
     else:
         warning_label.pack_forget()
 
-def detect_and_save_frames(video_path, start_datetime, display_video, progress_bar, percentage_label):
+def detect_and_save_frames(video_path, start_datetime, display_video, progress_bar, percentage_label, time_remaining_label):
     """Fonction pour détecter et sauvegarder les images"""
 
     try:
@@ -358,6 +359,8 @@ def detect_and_save_frames(video_path, start_datetime, display_video, progress_b
     except AssertionError:
         show_error_about_min_car()
     
+    start_time = time.time()  # Temps de début du traitement
+
     cap = cv2.VideoCapture(video_path)
     total_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))  # Nombre total de frames
     
@@ -493,22 +496,36 @@ def detect_and_save_frames(video_path, start_datetime, display_video, progress_b
             # Mettre à jour la barre de progression et le pourcentage
             progress_bar["value"] = frame_count
             percentage_label.config(text=f"{round(frame_count * 100 / total_frames)} %")
-            root.update_idletasks()
 
+            # Calculer le temps écoulé
+            elapsed_time = time.time() - start_time
+
+            # Estimer la vitesse de traitement (frames par seconde)
+            if frame_count > 0:
+                processing_speed = frame_count / elapsed_time  # Nombre de frames traitées par seconde
+                remaining_frames = total_frames - frame_count  # Frames restantes
+                estimated_time_remaining = remaining_frames / processing_speed  # Temps restant en secondes
+                estimated_time_remaining_str = time.strftime("%H:%M:%S", time.gmtime(estimated_time_remaining))
+            else:
+                estimated_time_remaining_str = "Calcul..."
+
+            # Mettre à jour l'affichage du temps restant
+            time_remaining_label.config(text=f"Temps restant estimé : {estimated_time_remaining_str}")
+
+            root.update_idletasks()
             
             frame_count += 1
 
             # Mettre à jour la barre de progression
             pbar.set_postfix(cars_detected=len(detected_cars))
-            pbar.update(1)    
+            pbar.update(1)
+
 
     # Sauvegarder les images des target
-    print(video_name)
     if not os.path.exists(video_name):
         os.makedirs(video_name)
-        print("ok")
+
     for i, car in enumerate(detected_cars):
-        file_timestamp = car["time"].strftime("%Y%m%d_%H%M%S")   # Timestamp formaté pour le nom du fichier
         file_name = f"{video_name}/car_{i}.jpg"
         cv2.imwrite(file_name, car["image"])
 
@@ -517,10 +534,53 @@ def detect_and_save_frames(video_path, start_datetime, display_video, progress_b
     cv2.destroyAllWindows()
 
 
+def get_video_duration(video_path):
+    """Retourne la durée d'une vidéo en secondes"""
+    try:
+        cap = cv2.VideoCapture(video_path)
+        fps = cap.get(cv2.CAP_PROP_FPS)
+        total_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+        cap.release()
+        return total_frames / fps  # Durée en secondes
+    except:
+        return 0  # En cas d'erreur, on retourne 0
+
+
+def update_timestamp(current_timestamp, video_path):
+    """Met à jour l'horodatage pour la prochaine vidéo en fonction de sa durée"""
+    duration = get_video_duration(video_path)  # Utilisation de la fonction optimisée
+    new_time = datetime.strptime(current_timestamp, "%d-%m-%Y %H:%M:%S") + timedelta(seconds=duration+1)   # On ajoute le +1 car il y a un écart de 1 sec entre chaque vidéo
+    return new_time.strftime("%d-%m-%Y %H:%M:%S")
+
+
+def process_video_queue(start_time_entry, display_video, progress_bar, percentage_label, video_progress_label, time_remaining_label):
+    """Traite toutes les vidéos en file d'attente"""
+    global video_queue  # Liste des vidéos sélectionnées
+    if not video_queue:
+        show_error_about_video()
+        return
+
+    start_datetime = start_time_entry.get()  # Récupérer l'horodatage initial
+    total_videos = len(video_queue)  # Nombre total de vidéos
+
+    for i, video_path in enumerate(video_queue):
+        # Mettre à jour le ratio des vidéos traitées
+        video_progress_label.config(text=f"{i + 1}/{total_videos} vidéos")
+        root.update_idletasks()
+
+        # Obtenir la durée de la vidéo en minutes pour estimer le temps restant
+        estimated_time = get_video_duration(video_path) / 60  # Convertir en minutes
+        time_remaining_label.config(text=f"Temps restant estimé : ~ {round(estimated_time, 1)} min")
+
+        detect_and_save_frames(video_path, start_datetime, display_video, progress_bar, percentage_label, time_remaining_label)
+        start_datetime = update_timestamp(start_datetime, video_path)  # Mettre à jour l'heure de début
+
+    # Fin du traitement, on remet le temps restant à zéro
+    time_remaining_label.config(text="Traitement terminé.")
 
 # Initialisation de l'interface
 def main():
-    global video_path, root, display_video, warning_label, roi_selected_label, min_car_selected_label
+    global video_queue, root, display_video, warning_label, roi_selected_label, min_car_selected_label
 
     # Créer la fenêtre principale
     root = tk.Tk()
@@ -530,16 +590,16 @@ def main():
     display_video = tk.BooleanVar(value=False)
 
     # Bouton pour charger la vidéo
-    load_button = tk.Button(root, text="Charger Vidéo", command=lambda: load_video(path_label))
+    load_button = tk.Button(root, text="Charger Vidéos", command=lambda: load_video(path_label))
     load_button.pack(pady=10)
 
     # Label pour afficher le chemin de la vidéo
-    path_label = tk.Label(root, text="Chemin de la vidéo :")
+    path_label = tk.Label(root, text="")
     path_label.pack(pady=10)
 
     # Bouton pour visualiser l'horodatage initial
     view_timestamp_button = tk.Button(root, text="Visualiser l'horodatage initial", 
-                                      command=lambda: display_first_frame(video_path))
+                                      command=lambda: display_first_frame(video_queue[0]))
     view_timestamp_button.pack(pady=10)
 
     # Label et champ pour l'heure de début
@@ -567,7 +627,7 @@ def main():
 
     # Bouton pour sélectionner la ROI
     select_roi_button = tk.Button(roi_frame, text="Sélectionner la zone de traitement", 
-                                  command=lambda: select_roi_from_video(video_path))
+                                  command=lambda: select_roi_from_video(video_queue[0]))
     select_roi_button.pack(side=tk.RIGHT, padx=5)
 
     # Label de confirmation de sélection de la roi
@@ -583,7 +643,7 @@ def main():
 
     # Bouton pour sélectionner la taille de voiture minimale (+ bouton d'information)
     select_min_car_button = tk.Button(min_car_frame, text="Sélectionner la taille minimale des voitures à détecter", 
-                                  command=lambda: select_min_car_from_video(video_path))
+                                  command=lambda: select_min_car_from_video(video_queue[0]))
     select_min_car_button.pack(side=tk.RIGHT, padx=5)
     
     # Label de confirmation de sélection de la min car
@@ -598,7 +658,7 @@ def main():
 
     # Label d'avertissement (caché au départ)
     warning_label = tk.Label(root, text="⚠ Avertissement : afficher la vidéo pendant le traitement\n"
-                                        "peut rallonger la durée du traitement.",
+                                        "peut légèrement rallonger la durée du traitement.",
                             fg="red", font=("Arial", 10, "italic"))
     
 
@@ -608,11 +668,18 @@ def main():
     
     # Bouton pour lancer le traitement
     process_button = tk.Button(root, text="Lancer le traitement", 
-                                command=lambda: detect_and_save_frames(video_path, start_time_entry.get(), display_video.get(), progress_bar, percentage_label))
+                                command=lambda: process_video_queue(start_time_entry, display_video.get(), progress_bar, percentage_label, video_progress_label, time_remaining_label))
     process_button.pack(pady=20)
 
     progress_bar.pack()
     percentage_label.pack(pady=10)
+
+    time_remaining_label = tk.Label(root, text="Temps restant estimé : --:--:--", font=('Helvetica', 12))
+    time_remaining_label.pack(pady=5)
+
+    video_progress_label = tk.Label(root, text="0/0 vidéos", font=('Helvetica', 12))
+    video_progress_label.pack(pady=5)
+
 
     # On place la fenêtre sur le coin en haut à gauche
     root.geometry(f"+{0}+{0}")
